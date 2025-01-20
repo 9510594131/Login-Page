@@ -1,0 +1,92 @@
+<!DOCTYPE html>  
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration & Login Page</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <h1>Registration</h1>
+
+    <label>Username:<input type="text" id="name1"></label><br><br>
+    <label>Password:<input type="password" id="pass1"></label><br><br>
+    <button type="submit" id="button1">Register</button>
+    <div id="reg"></div><br><br>
+
+    <h1>Login</h1>
+
+    <label>Username:<input type="text" id="name2"></label><br><br>
+    <label>Password:<input type="password" id="pass2"></label><br><br>
+    <button type="submit" id="button2">Login</button>
+    <div id="login"></div><br><br>
+
+    <script>
+        var username1=document.querySelector("#name1");
+        var password1=document.querySelector("#pass1");
+        var registrationButton=document.querySelector("#button1");
+        var regDiv=document.getElementById("reg");
+
+        var username2=document.querySelector("#name2");
+        var password2=document.querySelector("#pass2");
+        var loginButton=document.querySelector("#button2");
+        var loginDiv=document.getElementById("login");
+
+        var userlist=[];
+
+        registrationButton.addEventListener("click",()=>{
+            var registrationData={
+                username:username1.value,
+                password:password1.value
+            };
+            fetch("/data",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify(registrationData)
+            })
+            .then(response=>response.json())
+            .then(data=>{
+                if (data.message==="User data received successfully") {
+                    userlist=data.data;  
+                    regDiv.innerHTML=`<p>Registration successful. You can now login.</p>`;
+                } else{
+                    regDiv.innerHTML=`<p>Registration failed. Please try again.</p>`;
+                }
+            })
+            .catch(error=>{
+                console.error("Error during registration:",error);
+                regDiv.innerHTML=`<p>An error occurred during registration.</p>`;
+            });
+        });
+
+        loginButton.addEventListener("click",()=>{
+            var loginData={
+                username:username2.value,
+                password:password2.value
+            };
+            fetch("/login",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify(loginData)
+            })
+            .then(response=>response.json())
+            .then(data=>{
+                if (data.message==="Login successful") {
+                    loginDiv.innerHTML=`<p>Welcome ${data.user.username}</p>`;
+                } else {
+                    loginDiv.innerHTML=`<p>${data.message}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error("Error during login:",error);
+                loginDiv.innerHTML=`<p>An error occurred during login.</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
